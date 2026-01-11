@@ -48,7 +48,7 @@ If you want to run the script on startup automatically, follow the instructions:
 Certain autocorrect entries and spelling checks have been adapted from community contributions, including work by 
 - [_AutoHotkey AutoCorrect Script_ by endolith, Github](https://gist.github.com/endolith/876629)
 - [_Simple grammar and homophone errors_ by kunkel321, AutoHotkey forums](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=134988)
-- [ Script that uses hotstrings to correct about 4700 common English misspellings on-the-fly. Authored by Jim Biancolo and using [Wikipedia's List of Common Mispellings](https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings). See [AutoHotKey Documentation](https://www.autohotkey.com/docs/v2/Hotstrings.htm#AutoCorrect)
+- Script that uses hotstrings to correct about 4700 common English misspellings on-the-fly. Authored by Jim Biancolo and using [Wikipedia's List of Common Mispellings](https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings). See [AutoHotKey Documentation](https://www.autohotkey.com/docs/v2/Hotstrings.htm#AutoCorrect) for download.
 
 ## License
 
