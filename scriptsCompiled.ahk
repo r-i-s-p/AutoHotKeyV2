@@ -10,24 +10,60 @@
 ::\git::https://github.com/USERNAME
 
 ; ##### Short-hand #####
-:*:...::…
+; --- Arrows ---
 :*:>=::≥
 :*:<=::≤
 :*:=/=::≠
 :*:~~::≈
-:*:\dash::–
-:*:\pm::±
-:*:\degc::℃
-:*:\pi::π
-:*:\tm::™
-:*:\star::★
-:*:\club::♣
-:*:\diamond::♦
-:*:\heart::♥
-:*:\spade::♠
-:*:\checkmark::✅
-:*:\outlinestar::☆
+:*:<-::←
+:*:->::→
+::\implies::⇒
+:*:\uparrow::↑
+:*:\downarrow::↓
 
+; --- Greek letters ---
+::\alph::α
+::\beta::β
+::\delt::δ
+::\eps::ε
+::\eta::η
+::\gamm::γ
+::\kap::κ
+::\lamb::λ
+::\mu::μ
+::\nu::ν
+::\phi::φ
+::\pi::π
+::\psi::Ψ
+::\rho::ρ
+::\sig::σ
+::\tau::τ
+::\tt::θ
+::\xi::ξ
+
+; --- Math ---
+::\pm::±
+::\not::¬
+::\real::ℝ
+::\subset::∈
+::\partial::∂
+::\multiply::×
+::\diameter::ø
+::\infinity::∞
+
+; --- Symbols ---
+:*:...::…
+:*:\tm::™
+:*:\dash::–
+:*:\degc::℃
+:*:\amogus::ඞ
+::\star::★
+::\club::♣
+::\heart::♥
+::\spade::♠
+::\diamond::♦
+::\checkmark::✅
+::\outlinestar::☆
 
 :*:dof::degrees of freedom
 :*:mgmt::management
@@ -214,8 +250,6 @@ Enhance the language in the paragraph above any selection of metaphors, analogie
 
 :*C:\pff::\frac{{}\partial {}}{{}\partial {}}{left 12}
 
-:*C:\tt::\theta
-
 :*C:\tx::\text{{}{}}{left 1}
 
 :*C:\lr::{\}left( `n{\}right){left 8}
@@ -248,12 +282,12 @@ Enhance the language in the paragraph above any selection of metaphors, analogie
 
 ; ############################## HTML/CSS ##############################
 
-:*C:\dropcap::<p class="dropcap">`n</p>{left 5}
+:*:\dropcap::<p class="dropcap">`n</p>{left 5}
 
-:*C:\sub::<sub></sub>{left 6}
-:*C:\sup::<sup>[1]({#}footnote1)</sup>{left 19}
+::\sub::<sub></sub>{left 6}
+::\sup::<sup>[1]({#}footnote1)</sup>{left 19}
 
-:*C:\table::
+:*:\table::
 (
 | Index | Name   | Item Description |
 |:------|:------:|-----------------:|
@@ -262,14 +296,14 @@ Enhance the language in the paragraph above any selection of metaphors, analogie
 |      3|        |                  |
 )
 
-:*C:\image::
+:*:\image::
 (
 <img src="link"
 alt=""
 style="width:auto; height: auto; filter: grayscale(100%);" >
 )
 
-:*C:\column::
+:*:\column::
 (
 > [!column]
 >
@@ -278,13 +312,13 @@ style="width:auto; height: auto; filter: grayscale(100%);" >
 >
 )
 
-:*C:\quote::
+:*:\quote::
 (
 > [!quote]
 >
 )
 
-:*C:\reminder::
+:*:\reminder::
 (
 > [!reminder]
 >
@@ -360,6 +394,54 @@ y_list.append(y_value)
 :*:yymm:: {
     YYMM := SubStr(A_YYYY, -2) . '-' . A_MM     ; '.' is explicit concatenatation
     Send(YYMM)
+}
+
+; ############################# Custom Hotkeys #############################
+; Open Google in Firefox and search the highlighted text via {Ctrl}+{Shift}+{F}
+
+$^+t::{                ; "$" prevents the hotkey/function from calling itself
+    while GetKeyState("LCtrl", "P") AND GetKeyState("LShift", "P") AND GetKeyState("t", "P")
+        sleep 10
+    if (A_TimeSinceThisHotkey < 300) AND WinActive("ahk_exe firefox.exe") {
+        Send ("^+t")
+        return
+    }
+    else {
+        ; Preserve clipboard
+        oldClip := ClipboardAll()
+        A_Clipboard := ""
+
+        ; Copy highlighted text
+        Send("^c")
+        if !ClipWait(0.1) {
+            Clipboard := oldClip
+            return
+        }
+
+        query := A_Clipboard
+
+        ; Activate Firefox
+        if !WinExist("ahk_exe firefox.exe") {
+            Run("firefox.exe")
+            WinWait("ahk_exe firefox.exe")
+        }
+        WinActivate("ahk_exe firefox.exe")
+        WinWaitActive("ahk_exe firefox.exe")
+
+        ; Open new tab and search Google
+        Send("^t")
+        Sleep(50)
+        Send("https://translate.google.com/?sl=auto&tl=en&text=")
+        query := StrReplace(query, ",", "{%2C }") 
+        query := StrReplace(query, ":", "{%3A }")
+        query := StrReplace(query, ";", "{%3B }")
+        Send(query)
+        Send("{Enter}")
+
+        ; Restore clipboard
+        Sleep(200)
+        A_Clipboard := oldClip
+    }
 }
 
 ; Open Google in Firefox and search the highlighted text via {Ctrl}+{Shift}+{F}
@@ -551,6 +633,121 @@ y_list.append(y_value)
     Send("https://archive.is/newest/")
     Send("{Enter}")
 }
+
+
+; ############################# Keyboard Remapping #############################
+; ########## CapsLock Remapping ##########
+;================================================================================
+;CapsLock::return ; Disable capslock (script below disables short-press while keeping long-press functionality)
+LShift & CapsLock::return
+LAlt & CapsLock::return
+
+CapsLock::{            
+   while GetKeyState("CapsLock", "P")
+      sleep 10
+   if (A_TimeSinceThisHotkey >= 300) {
+      Send ("{LAlt Down}{CapsLock}{LAlt Up}")
+      SetCapsLockState False
+   }
+   else
+      Exit
+}
+
+; ########## LAlt (<!) Remapping ##########
+<!WheelUp::{
+   sleep 10
+   Send ("{Volume_Up}")
+}
+
+<!WheelDown::{
+   sleep 10
+   Send ("{Volume_Down}")
+}
+
+<!MButton::{
+   sleep 10
+   Send ("{Media_Play_Pause}")
+}
+
+<!WheelLeft::{
+   sleep 10
+   Send ("{LCtrl Down}{PgUp}{LCtrl Up}")
+   sleep 100 ; the tabs swap too quickly without this delay
+}
+
+<!WheelRight::{
+   sleep 10
+   Send ("{LCtrl Down}{PgDn}{LCtrl Up}")
+   sleep 100 ; the tabs swap too quickly without this delay
+}
+
+; XButton1 corresponds to the 'back' button; XButton2 corresponds to the 'forward' button
+<!XButton1::{ 
+   sleep 10
+   Send ("{Del}")
+}
+
+<!XButton2::{
+   sleep 10
+   Send ("{Enter}")
+}
+
++<!XButton2::{
+   sleep 10
+   Send ("+{Enter}") ; Shift (+) must be outside the curly brackets
+}
+
+<!A::{
+   sleep 10
+   Send ("{Left}")
+}
+
+<!D::{
+   sleep 10
+   Send ("{Right}")
+}
+
+<!W::{
+   sleep 10
+   Send ("{Up}")
+}
+
+<!S::{
+   sleep 10
+   Send ("{Down}")
+}
+
+; Use Shift (+) in addition to above arrow-key remappings for {Ctrl} and/or {Shift} functionality
++<!A::{
+   sleep 10
+   Send ("{LCtrl Down}{Left}{LCtrl Up}")
+}
+
++<!D::{
+   sleep 10
+   Send ("{LCtrl Down}{Right}{LCtrl Up}")
+}
+
++<!W::{
+   sleep 10
+   Send ("{LCtrl Down}{LShift Down}{Left}{LCtrl Up}{LShift Up}")
+}
+
++<!S::{
+   sleep 10
+   Send ("{LCtrl Down}{LShift Down}{Right}{LCtrl Up}{LShift Up}")
+}
+
+; ########## Misc. Remapping ##########
+; Reloads this script via {Alt}+{Shift}+{R}
++!r::Reload
+
+LWin & Esc::{
+Run "notepad.exe C:\Users\RSP\OneDrive\OneDrive Documents\Scripts\AutoHotkey\scriptTextReplaceKeyRemap.ahk"
+}
+
+; Put PC to Sleep with {Shift}+{LAlt}+{Del}
++!Del::DllCall("PowrProf\SetSuspendState", "Int",0, "Int",0, "Int",0)
 
 ; ############################################################################################################
 ; Subseqeuent code taken from https://www.autohotkey.com/boards/viewtopic.php?f=83&t=134988
@@ -7177,115 +7374,5 @@ y_list.append(y_value)
 ::youself::yourself
 ::youseff::yousef
 ::zeebra::zebra
-
-; ############################# Keyboard Remapping #############################
-; ##### CapsLock Remapping #####
-;CapsLock::return ; Disable capslock (script below disables short-press while keeping long-press functionality)
-LShift & CapsLock::return
-LAlt & CapsLock::return
-
-CapsLock::{            
-   while GetKeyState("CapsLock", "P")
-      sleep 10
-   if (A_TimeSinceThisHotkey >= 300) {
-      Send ("{LAlt Down}{CapsLock}{LAlt Up}")
-      SetCapsLockState False
-   }
-   else
-      Exit
-}
-
-; ##### LAlt (<!) Remapping #####
-LAlt & WheelUp::{
-   sleep 10
-   Send ("{Volume_Up}")
-}
-
-LAlt & WheelDown::{
-   sleep 10
-   Send ("{Volume_Down}")
-}
-
-LAlt & MButton::{
-   sleep 10
-   Send ("{Media_Play_Pause}")
-}
-
-LAlt & WheelLeft::{
-   sleep 10
-   Send ("{LCtrl Down}{PgUp}{LCtrl Up}")
-   sleep 100 ; the tabs swap too quickly without this delay
-}
-
-LAlt & WheelRight::{
-   sleep 10
-   Send ("{LCtrl Down}{PgDn}{LCtrl Up}")
-   sleep 100 ; the tabs swap too quickly without this delay
-}
-
-; XButton1 corresponds to the 'forward' button; XButton2 corresponds to the 'back' button
-LAlt & XButton1::{ 
-   sleep 10
-   Send ("{Del}")
-}
-
-LAlt & XButton2::{
-   sleep 10
-   Send ("{Enter}")
-}
-
-
-<!A::{
-   sleep 10
-   Send ("{Left}")
-}
-
-<!D::{
-   sleep 10
-   Send ("{Right}")
-}
-
-<!W::{
-   sleep 10
-   Send ("{Up}")
-}
-
-<!S::{
-   sleep 10
-   Send ("{Down}")
-}
-
-; Use Shift(+) in addition to the above arrow-key remappings for {Ctrl} and/or {Shift} functionality
-+<!A::{
-   sleep 10
-   Send ("{LCtrl Down}{Left}{LCtrl Up}")
-}
-
-+<!D::{
-   sleep 10
-   Send ("{LCtrl Down}{Right}{LCtrl Up}")
-}
-
-+<!W::{
-   sleep 10
-   Send ("{LCtrl Down}{LShift Down}{Left}{LCtrl Up}{LShift Up}")
-}
-
-+<!S::{
-   sleep 10
-   Send ("{LCtrl Down}{LShift Down}{Right}{LCtrl Up}{LShift Up}")
-}
-
-; ##### Misc. Remapping #####
-; Reloads this script via {Alt}+{Shift}+{R}
-+!r::Reload
-
-LWin & Esc::{
-Run "notepad.exe C:\Users\RSP\OneDrive\OneDrive Documents\Scripts\AutoHotkey\scriptTextReplace_KeyRemap.ahk"
-}
-
-; Send PC to Sleep with {Shift}+{LAlt}+{Del}
-+!Del::DllCall("PowrProf\SetSuspendState", "Int",0, "Int",0, "Int",0)
-
 
 return
