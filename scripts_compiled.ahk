@@ -3,9 +3,9 @@
 
 ; ############################## Short plain text ##############################
 ; ########## Temporary short-hand text ##########
-:*:!1::
-:*:!2::
-:*:!3::
+:*:!1::1
+:*:!2::2
+:*:!3::3
 
 ; ########## CLI ##########
 :*:\qbuild::npx quartz build --serve
@@ -1050,13 +1050,13 @@ XButton2::{
 +!r::Reload
 
 filepaths := [
-    INSERT_PATH_1,  
-    INSERT_PATH_2
+    "INSERT_PATH_1",  
+    "INSERT_PATH_2"
 ]
 
 filepaths_icon := [
-    INSERT_PATH_1,  
-    INSERT_PATH_2
+    "INSERT_PATH_1",  
+    "INSERT_PATH_2"
 ]
 
 LWin & Esc::{
