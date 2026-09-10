@@ -3,9 +3,12 @@
 
 ; ############################## Short plain text ##############################
 ; ########## Temporary short-hand text ##########
-:*:!1::1
-:*:!2::2
-:*:!3::3
+
+; Paste strings via {Ctrl}+{Shift}+{1/2/3/4}
+^+1::SendText("")
+^+2::SendText("")
+^+3::SendText("")
+^+4::SendText("")
 
 ; ########## CLI ##########
 :*:\qbuild::npx quartz build --serve
@@ -54,7 +57,7 @@
 ; --- Math and logic ---
 :*:>=::≥
 :*:<=::≤
-:*:\pm::±
+::\pm::±              ; no * as it will clash with \pmat in Latex
 :*:\real::ℝ
 :*:\sqroot::√
 :*:\divide::÷
@@ -121,14 +124,25 @@
 ::\outlineheart::♡
 ::\outlinestar::☆
 
+:*:\euro::€
+:*:\pounds::£
+:*:\yen::¥	
+
+:*:(::(){left 1}
+:*:[::[]{left 1}     
+:*:{::{{}{}}{left 1}                ; curly brackets in hotstrings escaped by enclosing them, #anchor_escape_seq_hotstring 
+
+; --- Text Strings ---
 :*:dof::degrees of freedom
+:*: envir::environment
 :*:eod::end of day
 :*:et al::et al., 
-:*:fmi::for more information
+:*:fmi::for more information 
 :*:ie ::i.e.{space} 
 :*:mgmt::management
+:*:pronu::pronunciation
 ::propto::proportional to
-:: rs::relationship
+:*: rs::relationship
 :*:statsig::statistically significant
 :*:wrt::with respect to
 
@@ -151,6 +165,7 @@
 ::aeroplane::airplane
 ::artefact::artifact
 ::British::American
+:*:centre::center
 ::cheque::check
 ::chequerboard::checkerboard
 ::chequered::checkered
@@ -184,8 +199,10 @@
 ::a lot of::many of 
 ::adverse to::averse to
 ::became an urban legend::became legendary
+::by definition::by definition_in_math?
 ::dichotomy between::dichotomy_or_difference between
 ::disinterested::uninterested
+::don't understand how::disapprove that
 ::fortuitously,::fortunately,
 ::fullsome apology::copious apology
 ::homogenous::homologous
@@ -195,6 +212,7 @@
 ::hot button::hot topic
 ::hung him::hanged him
 ::interred in::interned in
+::judgement::judgment
 ::kinda::somewhat 
 ::literally::literally_or_figuratively
 ::mitigate toward::militate toward
@@ -226,6 +244,7 @@
 ::each and every::each
 ::end result::result
 ::future plans::plans
+:*:obviously::{Space}
 ::repeat again::repeat
 ::true fact::fact
 
@@ -244,6 +263,7 @@
 ::various::a constellation of
 
 ; ########## Frequently mistyped; Autocorrect (Custom) ##########
+:?*:,.::. 
 ::abiove::above
 ::alll::all
 ::anaemia::anemia
@@ -260,7 +280,6 @@
 ::calibre::caliber
 ::candour::candor
 ::clamour::clamor
-::centre::center
 ::civilise::civilize
 ::coefficeint::coefficient 
 ::conclussion::conclusion 
@@ -675,6 +694,22 @@ $^+t::{                ; "$" prevents the hotkey/function from calling itself
     A_Clipboard := oldClip
 }
 
+; Run/Kill Gesto-Electron bat script via {Ctrl}+{Shift}+{G}
+; NOTE: This hotkey is for a custom script I wrote building on Gesto-Electron. Adjust the functionality of this hotkey as you see fit.
+^+g:: 
+{   
+    if WinExist("ahk_exe cmd.exe") {
+        WinClose("cmd.exe") 
+        Sleep(1000)
+    }
+    else {
+        Run A_ComSpec ' /c ""C:\Users\INSERT_USERNAME\…\run_gesto_electron.bat"" '
+        WinWait("cmd.exe")
+        WinMinimize ; Use the window found by WinWait.
+        MsgBox("Gesto-Electron activated." , "AHK to Gesto-Electron", "T1")
+    }
+}
+
 ; Return the pixel hexcode via {Control}+{Shift}+{Z} 
 ^+z:: {
     MouseGetPos &MouseX, &MouseY
@@ -931,6 +966,7 @@ databaseID, notion_page_title
 LShift & CapsLock::return
 LAlt & CapsLock::return
 
+; This hotkey is for activating Wox.exe, a program enabling global search on my devices. Adjust this hotkey as you see fit. 
 CapsLock::{            
    while GetKeyState("CapsLock", "P")
       sleep 10
@@ -1050,14 +1086,32 @@ XButton2::{
 +!r::Reload
 
 filepaths := [
-    "INSERT_PATH_1",  
-    "INSERT_PATH_2"
+    INSERT_PATH_1,  
+    INSERT_PATH_2
 ]
 
 filepaths_icon := [
-    "INSERT_PATH_1",  
-    "INSERT_PATH_2"
+    INSERT_PATH_1,  
+    INSERT_PATH_2
 ]
+
+; Reloads this script via {Alt}+{Shift}+{R}
++!r::{
+    status := 0
+    for path in filepaths_icon {
+        if FileExist(path) {
+            TraySetIcon(path, 2, True)
+            status := 1
+            ; MsgBox("Successful icon change.")         ; uncomment during checks
+	    break
+        }
+        
+        if status = 0 {
+            MsgBox("Could not update icon; invalid filepaths_icon address.") 
+        }
+    }
+    Reload
+}
 
 LWin & Esc::{
     for path in filepaths {
@@ -1065,14 +1119,15 @@ LWin & Esc::{
             Run "notepad.exe " path             ; there needs to be a space after notepad.exe within the inverted commas
             break
         }
+    MsgBox("Unable to locate script filepath; invalid filepaths address.")
     }
 }
 
-for path in filepaths_icon {
-    if FileExist(path) {
-        TraySetIcon(path, 2, True)
-        break
-    }
+; Opens Task Switcher using R followed by L mouse buttons
+~RButton & LButton::{
+    Send("{Alt Down}{Tab}")
+    Sleep(2266)
+    Send("{Alt Up}")
 }
 
 ; Put PC to Sleep with {Shift}+{LAlt}+{Del}
