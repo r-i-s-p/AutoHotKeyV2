@@ -622,6 +622,34 @@ $^+t::{                ; "$" prevents the hotkey/function from calling itself
     }
 }
 
+; Word counter via {Control}+{Shift}+{Y} 
+^+y::
+{
+    ; Copy highlighted text
+    A_Clipboard := ""
+    Send("^c")
+    if !ClipWait(1)
+    {
+        MsgBox("No text selected.")
+        return
+    }
+
+    text := A_Clipboard
+
+    ; Count sequences of letters/numbers as words.
+    ; Punctuation, spaces, --, and em dashes separate words.
+    words := 0
+    pos := 1
+
+    while RegExMatch(text, "[\p{L}\p{N}]+", &match, pos)
+    {
+        words++
+        pos := match.Pos + match.Len
+    }
+
+    MsgBox("Word count: " words,, "T1")
+}
+
 ; Open Merriam Webster in Firefox and search the highlighted text via {Ctrl}+{Shift}+{D}
 ^+d:: 
 {
